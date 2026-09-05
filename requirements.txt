@@ -1,0 +1,13 @@
+# Dependencies for AI-Powered Intelligent Assistant for Indian Standards & BIS Services
+# Problem Statement 26107 (Ministry of Consumer Affairs - DoCA)
+
+streamlit>=1.40.0
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+pandas>=2.1.0
+google-generativeai>=0.8.0
+groq>=0.11.0
+openai>=1.40.0
+pydantic>=2.7.0
+python-dotenv>=1.0.0
+

@@ -1,0 +1,122 @@
+/* 
+  Department of Consumer Affairs (DoCA) & Bureau of Indian Standards (BIS)
+  AI-Powered Intelligent Assistant - Production Stylesheet
+*/
+
+/* 1. Reset Streamlit App Header and Hide Deploy Decorations */
+.stAppDeployButton, 
+[data-testid="stAppDeployButton"], 
+[data-testid="stToolbar"] [data-testid="stAppDeployButton"],
+#stDecoration {
+    display: none !important;
+    visibility: hidden !important;
+}
+
+/* 2. Compact Page Padding (Decreased Upper Padding) */
+.block-container, 
+[data-testid="stMainBlockContainer"],
+div.stMainBlockContainer {
+    padding-top: 1.2rem !important;
+    padding-bottom: 2rem !important;
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
+}
+
+header[data-testid="stHeader"] {
+    height: 1.5rem !important;
+    background-color: transparent !important;
+}
+
+/* 3. Sticky Navigation Navbar */
+div[data-testid="stTabs"] > div[role="tablist"] {
+    position: -webkit-sticky !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 999 !important;
+    background: #ffffff !important;
+    padding: 0.6rem 0.5rem !important;
+    border-bottom: 2px solid #005ead !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08) !important;
+    border-radius: 6px 6px 0 0 !important;
+}
+
+/* Tab buttons typography */
+div[data-testid="stTabs"] button[role="tab"] {
+    font-weight: 600 !important;
+    font-size: 0.95rem !important;
+    padding: 0.5rem 1rem !important;
+    color: #334155 !important;
+}
+
+div[data-testid="stTabs"] button[role="tab"][aria-selected="true"] {
+    color: #005ead !important;
+    border-bottom: 3px solid #005ead !important;
+}
+
+/* 4. Portal Header Card */
+.main-header {
+    background: linear-gradient(135deg, #0b3c5d 0%, #1d2731 100%);
+    color: white;
+    padding: 1.5rem 2rem;
+    border-radius: 10px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+}
+
+.main-header h1 {
+    color: #f9ba32;
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.main-header p {
+    color: #e0e0e0;
+    margin: 0.3rem 0 0 0;
+    font-size: 0.95rem;
+}
+
+/* 5. Badges and Status Pills */
+.tag-pill {
+    display: inline-block;
+    background-color: #e8f4fd;
+    color: #005ead;
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-right: 0.3rem;
+}
+
+.loop-badge {
+    display: inline-block;
+    background-color: #e6f4ea;
+    color: #137333;
+    padding: 0.4rem 0.8rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 0.8rem;
+    border: 1px solid #ceead6;
+}
+
+/* 6. Form Controls and Buttons */
+.stButton>button {
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+/* 7. Sidebar Card */
+.sidebar-logo-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 6px;
+    margin-bottom: 14px;
+    background: linear-gradient(180deg, #f0f7fc 0%, #ffffff 100%);
+    border-radius: 10px;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+}
+
