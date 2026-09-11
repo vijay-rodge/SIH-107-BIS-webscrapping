@@ -31,6 +31,7 @@ Your tasks:
    - Price in India (INR) & Outside India
    - Key Scope / National Foreword / Clauses from the preview document
 4. Determine the primary technical domain (e.g., Electrical, Food/Water, Electronics, Metallurgy, Protective Gear, Hallmarking).
+5. Format extracted candidates in a compact, screen-responsive markdown table with at most 4 columns (e.g. `| IS Number & Year | Status & Committee | Official Title & Scope | Match Result |`), or use structured bullet points. NEVER create wide tables with candidates spread horizontally across many columns, as this breaks screen responsiveness on mobile and standard screens.
 
 Output your analysis in structured, factual format with clear sections. DO NOT hallucinate standard numbers or clauses not present in the candidates or verified BIS data."""
 
@@ -54,7 +55,10 @@ Your response must include:
 6. **Language**:
    - Respond in the language requested by the user (English, Hindi / Hinglish, or regional languages). Keep tone encouraging, authoritative, and actionable.
 7. **Document / Source Reference**:
-   - Provide standard number, technical committee, and reference link."""
+   - Provide standard number, technical committee, and reference link.
+8. **Layout & Screen Responsiveness**:
+   - Format lists, parameters, and steps vertically using bold bullet points or compact cards.
+   - Do NOT construct wide tables with 4+ columns that overflow standard viewports or mobile devices."""
 
 
 class DualLLMPipeline:

@@ -36,7 +36,7 @@ def render_tab_database(csv_file: str):
         st.write(f"Displaying **{len(filtered_df)}** of **{len(df)}** standards in CSV:")
         st.dataframe(
             filtered_df[["is_no", "title", "status", "technical_committee", "amendments", "price_in_india", "price_outside_india"]],
-            use_container_width=True
+            width="stretch"
         )
 
         # Standard Detail Inspector

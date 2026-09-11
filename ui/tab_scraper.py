@@ -38,7 +38,7 @@ def render_tab_scraper(search_loop: BISSearchLoop, csv_file: str):
                 st.success(f"Successfully scraped {len(items)} items ({'IS Number Search' if is_std else 'Keyword Search'})! Added {added} new unique standard(s) to '{csv_file}'.")
                 
                 df_scraped = pd.DataFrame(items)
-                st.dataframe(df_scraped[["is_no", "title", "status", "technical_committee", "price_in_india", "price_outside_india", "preview_id"]], use_container_width=True)
+                st.dataframe(df_scraped[["is_no", "title", "status", "technical_committee", "price_in_india", "price_outside_india", "preview_id"]], width="stretch")
             else:
                 st.warning("No standards found on the live portal for this keyword, or server connection timed out.")
 

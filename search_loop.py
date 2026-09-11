@@ -89,8 +89,15 @@ class BISSearchLoop:
                 )
                 
                 # Step 3: Save / update into CSV
+                # Step 3: Save / update into PostgreSQL & CSV
                 if scraped_items:
                     newly_saved_count = save_to_csv(scraped_items, self.csv_file, append=True)
+                    try:
+                        from db import save_standards
+                        newly_saved_count = save_standards(scraped_items, self.csv_file)
+                    except Exception as err:
+                        print(f"[BISSearchLoop] db.save_standards error, falling back to CSV: {err}")
+                        newly_saved_count = save_to_csv(scraped_items, self.csv_file, append=True)
             except Exception as e:
                 print(f"[BISSearchLoop] Live scraping error for '{search_term}' (is_std={is_standard_number}): {e}")
 

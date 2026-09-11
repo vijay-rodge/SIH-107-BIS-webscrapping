@@ -120,3 +120,155 @@ div[data-testid="stTabs"] button[role="tab"][aria-selected="true"] {
     box-shadow: 0 2px 4px rgba(0,0,0,0.04);
 }
 
+/* 8. Responsive Text Wrapping and Table Containment */
+.stMarkdown, div[data-testid="stMarkdownContainer"] {
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+    max-width: 100% !important;
+}
+
+/* Wrap markdown tables in smooth horizontal scrolling so they never push page layout off-screen */
+div[data-testid="stMarkdownContainer"] table {
+    display: block !important;
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    border-collapse: collapse !important;
+    margin: 1rem 0 !important;
+}
+
+div[data-testid="stMarkdownContainer"] th,
+div[data-testid="stMarkdownContainer"] td {
+    white-space: normal !important;
+    word-wrap: break-word !important;
+    min-width: 120px !important;
+    max-width: 280px !important;
+    padding: 0.5rem 0.75rem !important;
+}
+
+/* Preformatted text / code block overflow protection */
+pre, code {
+    white-space: pre-wrap !important;
+    word-break: break-all !important;
+    max-width: 100% !important;
+}
+
+/* 9. Sidebar Dark/Light Adaptive Styling */
+[data-testid="stSidebar"] {
+    background-color: var(--secondary-background-color, #1a2333) !important;
+    color: var(--text-color, #f1f5f9) !important;
+}
+
+[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p,
+[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] span,
+[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] li,
+[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] label,
+[data-testid="stSidebar"] .stCaption,
+[data-testid="stSidebar"] label {
+    color: #f1f5f9 !important;
+}
+
+[data-testid="stSidebar"],
+[data-testid="stSidebarContent"],
+[data-testid="stSidebar"] > div:first-child {
+    background-color: #111827 !important;
+    color: #f1f5f9 !important;
+}
+
+[data-testid="stSidebar"] * {
+    color: #f1f5f9;
+}
+
+[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p,
+[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] span,
+[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] li,
+[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] label,
+[data-testid="stSidebar"] .stCaption,
+[data-testid="stSidebar"] small,
+[data-testid="stSidebar"] label,
+[data-testid="stSidebar"] div[data-testid="stMarkdownContainer"] {
+    color: #e2e8f0 !important;
+}
+
+[data-testid="stSidebar"] h1,
+[data-testid="stSidebar"] h2,
+[data-testid="stSidebar"] h3,
+[data-testid="stSidebar"] h4,
+[data-testid="stSidebar"] strong {
+    color: #f59e0b !important;
+}
+
+/* Form controls inside sidebar in dark mode */
+[data-testid="stSidebar"] select,
+[data-testid="stSidebar"] input,
+[data-testid="stSidebar"] div[data-baseweb="select"] > div {
+    background-color: #1f2937 !important;
+    color: #f1f5f9 !important;
+    border-color: #374151 !important;
+}
+
+[data-testid="stSidebar"] div[data-baseweb="select"] svg {
+    fill: #f1f5f9 !important;
+}
+
+/* Mobile Navigation Options Card inside Sidebar */
+.mobile-nav-wrapper {
+    background: #0f172a !important;
+    border: 1px solid #334155 !important;
+    border-radius: 8px !important;
+    padding: 12px 14px !important;
+    margin: 10px 0 16px 0 !important;
+}
+
+.mobile-nav-wrapper h4 {
+    margin: 0 0 8px 0 !important;
+    font-size: 0.95rem !important;
+    color: #f59e0b !important;
+}
+
+.mobile-nav-wrapper label span {
+    color: #f1f5f9 !important;
+    font-weight: 500 !important;
+    font-size: 0.9rem !important;
+}
+
+/* Desktop View: Hide mobile navigation block if on large screens */
+@media (min-width: 992px) {
+    .mobile-nav-wrapper {
+        display: none !important;
+    }
+}
+
+/* 10. Mobile & Sliding Window Sidebar Responsive Fix */
+@media (max-width: 991px) {
+    [data-testid="stSidebar"],
+    [data-testid="stSidebarContent"],
+    [data-testid="stSidebar"] > div:first-child {
+        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.5) !important;
+        background-color: #111827 !important;
+        color: #f1f5f9 !important;
+        z-index: 999999 !important;
+    }
+    
+    [data-testid="stSidebar"][aria-expanded="true"] {
+        width: 85vw !important;
+        max-width: 320px !important;
+    }
+    
+    /* Ensure main block container adjusts and doesn't get obscured */
+    .block-container,
+    [data-testid="stMainBlockContainer"] {
+        padding-left: 0.8rem !important;
+        padding-right: 0.8rem !important;
+        max-width: 100vw !important;
+        overflow-x: hidden !important;
+    }
+
+    /* Stack 2-column layout into 1 column on mobile/tablet so right side never goes off screen */
+    [data-testid="column"] {
+        width: 100% !important;
+        flex: 1 1 100% !important;
+        min-width: 100% !important;
+    }
+}
+

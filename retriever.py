@@ -24,15 +24,27 @@ class StandardsRetriever:
             return
 
         standards = []
+        """Loads and refreshes standards from PostgreSQL (or CSV fallback)."""
         try:
             with open(self.csv_path, mode="r", encoding="utf-8") as f:
                 reader = csv.DictReader(f)
                 for row in reader:
                     standards.append(row)
             self.standards = standards
+            from db import load_all_standards
+            self.standards = load_all_standards(self.csv_path)
         except Exception as e:
             print(f"[StandardsRetriever] Error loading CSV: {e}")
             self.standards = []
+            print(f"[StandardsRetriever] Error loading from db: {e}")
+            if os.path.exists(self.csv_path):
+                try:
+                    with open(self.csv_path, mode="r", encoding="utf-8") as f:
+                        self.standards = list(csv.DictReader(f))
+                except Exception:
+                    self.standards = []
+            else:
+                self.standards = []
 
     def extract_is_numbers(self, query: str) -> List[str]:
         """Extracts candidate IS numbers from user query, e.g., IS 10500, IS:1417, 1885."""

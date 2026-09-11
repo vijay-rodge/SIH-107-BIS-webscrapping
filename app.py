@@ -17,6 +17,10 @@ load_dotenv(override=True)
 from search_loop import BISSearchLoop
 from scraper import BISScraper, save_to_csv
 from bis_knowledge import BIS_SCHEMES, BIS_LABORATORIES, CONSUMER_SERVICES
+from db import init_db, load_all_standards, get_database_url, save_standards
+
+# Initialize PostgreSQL database table & initial seed if DATABASE_URL is set
+init_db()
 
 # Streamlit Page Config
 st.set_page_config(
@@ -122,6 +126,141 @@ st.markdown("""
         border-radius: 6px;
         font-weight: 500;
     }
+
+    /* Responsive Text Wrapping and Table Containment */
+    .stMarkdown, div[data-testid="stMarkdownContainer"] {
+        word-break: break-word !important;
+        overflow-wrap: break-word !important;
+        max-width: 100% !important;
+    }
+
+    /* Wrap markdown tables in smooth horizontal scrolling so they never push page layout off-screen */
+    div[data-testid="stMarkdownContainer"] table {
+        display: block !important;
+        max-width: 100% !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        border-collapse: collapse !important;
+        margin: 1rem 0 !important;
+    }
+
+    div[data-testid="stMarkdownContainer"] th,
+    div[data-testid="stMarkdownContainer"] td {
+        white-space: normal !important;
+        word-wrap: break-word !important;
+        min-width: 120px !important;
+        max-width: 280px !important;
+        padding: 0.5rem 0.75rem !important;
+    }
+
+    /* Preformatted text / code block overflow protection */
+    pre, code {
+        white-space: pre-wrap !important;
+        word-break: break-all !important;
+        max-width: 100% !important;
+    }
+
+    /* 9. Sidebar Dark/Light Adaptive Styling */
+    [data-testid="stSidebar"],
+    [data-testid="stSidebarContent"],
+    [data-testid="stSidebar"] > div:first-child {
+        background-color: #111827 !important;
+        color: #f1f5f9 !important;
+    }
+
+    [data-testid="stSidebar"] * {
+        color: #f1f5f9;
+    }
+
+    [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p,
+    [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] span,
+    [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] li,
+    [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] label,
+    [data-testid="stSidebar"] .stCaption,
+    [data-testid="stSidebar"] small,
+    [data-testid="stSidebar"] label,
+    [data-testid="stSidebar"] div[data-testid="stMarkdownContainer"] {
+        color: #e2e8f0 !important;
+    }
+
+    [data-testid="stSidebar"] h1,
+    [data-testid="stSidebar"] h2,
+    [data-testid="stSidebar"] h3,
+    [data-testid="stSidebar"] h4,
+    [data-testid="stSidebar"] strong {
+        color: #f59e0b !important;
+    }
+
+    /* Form controls inside sidebar in dark mode */
+    [data-testid="stSidebar"] select,
+    [data-testid="stSidebar"] input,
+    [data-testid="stSidebar"] div[data-baseweb="select"] > div {
+        background-color: #1f2937 !important;
+        color: #f1f5f9 !important;
+        border-color: #374151 !important;
+    }
+
+    [data-testid="stSidebar"] div[data-baseweb="select"] svg {
+        fill: #f1f5f9 !important;
+    }
+
+    /* Mobile Navigation Options Card inside Sidebar */
+    .mobile-nav-wrapper {
+        background: #0f172a !important;
+        border: 1px solid #334155 !important;
+        border-radius: 8px !important;
+        padding: 12px 14px !important;
+        margin: 10px 0 16px 0 !important;
+    }
+
+    .mobile-nav-wrapper h4 {
+        margin: 0 0 8px 0 !important;
+        font-size: 0.95rem !important;
+        color: #f59e0b !important;
+    }
+
+    .mobile-nav-wrapper label span {
+        color: #f1f5f9 !important;
+        font-weight: 500 !important;
+        font-size: 0.9rem !important;
+    }
+
+    /* Desktop View: Hide mobile navigation block if on large screens */
+    @media (min-width: 992px) {
+        .mobile-nav-wrapper {
+            display: none !important;
+        }
+    }
+
+    /* Mobile & Sliding Window Sidebar Responsive Fix */
+    @media (max-width: 991px) {
+        [data-testid="stSidebar"],
+        [data-testid="stSidebarContent"],
+        [data-testid="stSidebar"] > div:first-child {
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.5) !important;
+            background-color: #111827 !important;
+            color: #f1f5f9 !important;
+            z-index: 999999 !important;
+        }
+        [data-testid="stSidebar"][aria-expanded="true"] {
+            width: 85vw !important;
+            max-width: 320px !important;
+        }
+        .block-container,
+        [data-testid="stMainBlockContainer"] {
+            padding-left: 0.8rem !important;
+            padding-right: 0.8rem !important;
+            max-width: 100vw !important;
+            overflow-x: hidden !important;
+        }
+
+        /* Stack 2-column layout into 1 column on mobile/tablet so right side never goes off screen */
+        [data-testid="column"] {
+            width: 100% !important;
+            flex: 1 1 100% !important;
+            min-width: 100% !important;
+        }
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -136,7 +275,7 @@ search_loop = get_search_loop()
 # ----------------- SIDEBAR -----------------
 with st.sidebar:
     st.markdown("""
-    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12px 6px; margin-bottom: 14px; background: linear-gradient(180deg, #f0f7fc 0%, #ffffff 100%); border-radius: 10px; border: 1px solid #cbd5e1; box-shadow: 0 2px 4px rgba(0,0,0,0.04);">
+    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12px 6px; margin-bottom: 14px; background: #0f172a; border-radius: 10px; border: 1px solid #334155; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">
         <svg width="64" height="64" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
             <circle cx="50" cy="50" r="48" fill="#0b3c5d" stroke="#f9ba32" stroke-width="3"/>
             <circle cx="50" cy="50" r="39" fill="#ffffff"/>
@@ -147,9 +286,9 @@ with st.sidebar:
             <text x="50" y="83" font-size="8" font-weight="bold" fill="#ffffff" text-anchor="middle" font-family="Arial, sans-serif">BIS • INDIA</text>
         </svg>
         <div style="text-align: center; margin-top: 8px;">
-            <span style="font-weight: 800; font-size: 1.05rem; color: #0b3c5d; display: block; letter-spacing: 0.5px;">भारतीय मानक ब्यूरो</span>
-            <span style="font-size: 0.75rem; font-weight: 700; color: #005ead; display: block;">BUREAU OF INDIAN STANDARDS</span>
-            <span style="font-size: 0.7rem; color: #64748b; display: block; margin-top: 2px;">Govt. of India | DoCA</span>
+            <span style="font-weight: 800; font-size: 1.05rem; color: #f59e0b; display: block; letter-spacing: 0.5px;">भारतीय मानक ब्यूरो</span>
+            <span style="font-size: 0.75rem; font-weight: 700; color: #38bdf8; display: block;">BUREAU OF INDIAN STANDARDS</span>
+            <span style="font-size: 0.7rem; color: #94a3b8; display: block; margin-top: 2px;">Govt. of India | DoCA</span>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -157,7 +296,28 @@ with st.sidebar:
     st.markdown("### **DoCA & BIS Portal**")
     st.caption("Ministry of Consumer Affairs, Food & Public Distribution")
     
+    # Mobile View Navigation Section (Prominently placed in the sliding window above settings)
+    st.markdown("#### **Portal Navigation**")
+    nav_tabs = [
+        "Conversational Assistant",
+        "Manual Web Scraper",
+        "Standards CSV Database",
+        "BIS Schemes & Hallmarking"
+    ]
+    if "active_nav_tab" not in st.session_state:
+        st.session_state.active_nav_tab = nav_tabs[0]
+
+    selected_nav = st.radio(
+        "Select Portal View:",
+        nav_tabs,
+        index=nav_tabs.index(st.session_state.active_nav_tab) if st.session_state.active_nav_tab in nav_tabs else 0,
+        key="mobile_nav_radio",
+        label_visibility="collapsed"
+    )
+    st.session_state.active_nav_tab = selected_nav
     st.divider()
+
+
     st.subheader("System & Model Settings")
     
     language = st.selectbox(
@@ -181,7 +341,6 @@ with st.sidebar:
     st.markdown(f"- **Gemini Key**: {'Configured in .env' if gemini_env else 'Not Configured'}")
     st.markdown(f"- **Groq Key**: {'Configured in .env' if groq_env else 'Not Configured'}")
     st.markdown(f"- **OpenAI Key**: {'Configured in .env' if openai_env else 'Not Configured'}")
-    st.caption("Keys can be placed in `.env` or supplied below for this session.")
 
     custom_api_key = None
     if provider_choice != "Auto / Fallback Engine":
@@ -191,23 +350,25 @@ with st.sidebar:
             help="Overrides the key in .env for this session."
         )
 
-    st.divider()
     st.subheader("Automated Search & Scrape Settings")
     live_scrape_enabled = st.toggle("Live Web Scrape on Every Query", value=True, help="When enabled, queries standardsbis.bsbedge.com live, scrapes matching standards, updates standards_data.csv, and runs LLM 1 & LLM 2.")
     max_scrape_per_query = st.slider("Max items to scrape per query", min_value=1, max_value=15, value=5)
 
     st.divider()
     st.subheader("Knowledge Base Statistics")
-    if os.path.exists(CSV_FILE):
-        try:
-            df_stat = pd.read_csv(CSV_FILE)
-            st.metric("Standards in CSV Database", len(df_stat))
-            active_count = len(df_stat[df_stat['status'].str.lower() == 'active'])
-            st.metric("Active Standards", active_count)
-        except Exception:
-            st.write("Reading database...")
+    db_active = bool(get_database_url())
+    if db_active:
+        st.caption("Storage: PostgreSQL Cloud Database (Persistent)")
     else:
-        st.warning("CSV Database not initialized.")
+        st.caption("Storage: Local CSV (Ephemeral on Cloud)")
+
+    try:
+        records_all = load_all_standards(CSV_FILE)
+        st.metric("Total Standards Stored", len(records_all))
+        active_count = sum(1 for r in records_all if str(r.get('status', '')).strip().lower() == 'active')
+        st.metric("Active Standards", active_count)
+    except Exception:
+        st.write("Reading database...")
 
     st.divider()
     st.subheader("Official Portals")
@@ -261,19 +422,24 @@ with tab1:
         cols_btn = st.columns(3)
         clicked_query = None
         for i, (label, query_text) in enumerate(sample_queries):
-            if cols_btn[i].button(label, key=f"quick_btn_{i}", use_container_width=True):
+            if cols_btn[i].button(label, key=f"quick_btn_{i}", width="stretch"):
                 clicked_query = query_text
                 st.session_state["user_query_input"] = query_text
 
-        # User Query Input
-        user_query = st.text_input(
-            "Enter Keyword, Product, or IS Number:",
-            value=clicked_query if clicked_query else st.session_state.get("user_query_input", ""),
-            placeholder="e.g., IS 10500, IS 138, pressure cooker, battery charger, solar inverter...",
-            key="user_query_input"
-        )
+        # Search Form to enable pressing Enter to submit
+        with st.form(key="search_form", clear_on_submit=False):
+            # User Query Input (Pressing Enter inside this input triggers the form submit button)
+            default_val = clicked_query if clicked_query else st.session_state.get("user_query_input", "")
+            user_query = st.text_input(
+                "Enter Keyword, Product, or IS Number:",
+                value=default_val,
+                placeholder="e.g., IS 10500, IS 138, pressure cooker, battery charger, solar inverter...",
+                key="user_query_input"
+            )
+            submit_btn = st.form_submit_button("Search and Analyze", type="primary", width="stretch")
 
-        submit_btn = st.button("Search and Analyze", type="primary", use_container_width=True)
+        if submit_btn and not user_query.strip():
+            st.warning("Please enter an IS number, product name, or keyword before searching.")
 
     with col_inspect:
         st.subheader("Automated Loop & Pipeline Inspector")
@@ -281,7 +447,11 @@ with tab1:
         st.info("Webpage Search ➔ Scrape Data & HTML Doc ➔ Store in CSV ➔ LLM 1 (Filter) ➔ LLM 2 (Advisor)")
 
     # Determine query to execute (either from quick click or text submission)
-    query_to_run = clicked_query or (user_query.strip() if submit_btn and user_query.strip() else None)
+    query_to_run = None
+    if clicked_query:
+        query_to_run = clicked_query
+    elif submit_btn and user_query.strip():
+        query_to_run = user_query.strip()
 
     if query_to_run:
         with st.spinner(f"Executing Automated Search, Scrape, and Dual-LLM Loop for '{query_to_run}'..."):
@@ -382,7 +552,7 @@ with tab2:
                 st.success(f"Successfully scraped {len(items)} items ({'IS Number Search' if is_std else 'Keyword Search'})! Added {added} new unique standard(s) to '{CSV_FILE}'.")
                 
                 df_scraped = pd.DataFrame(items)
-                st.dataframe(df_scraped[["is_no", "title", "status", "technical_committee", "price_in_india", "price_outside_india", "preview_id"]], use_container_width=True)
+                st.dataframe(df_scraped[["is_no", "title", "status", "technical_committee", "price_in_india", "price_outside_india", "preview_id"]], width="stretch")
             else:
                 st.warning("No standards found on the live portal for this keyword, or server connection timed out.")
 
@@ -390,10 +560,15 @@ with tab2:
 # ----------------- TAB 3: STANDARDS CSV EXPLORER -----------------
 with tab3:
     st.subheader("Standards Knowledge Base Explorer")
-    st.caption(f"Browsing `{CSV_FILE}` (dynamically updated by every search-and-scrape cycle).")
+    db_conn = bool(get_database_url())
+    if db_conn:
+        st.caption("Live connection: PostgreSQL Cloud Database (Permanent Storage across restarts).")
+    else:
+        st.caption(f"Browsing local `{CSV_FILE}` (dynamically updated by every search-and-scrape cycle).")
 
-    if os.path.exists(CSV_FILE):
-        df = pd.read_csv(CSV_FILE)
+    all_data = load_all_standards(CSV_FILE)
+    if all_data:
+        df = pd.DataFrame(all_data)
         
         # Search & Filter
         col_f1, col_f2 = st.columns([3, 1])
@@ -418,7 +593,7 @@ with tab3:
         st.write(f"Displaying **{len(filtered_df)}** of **{len(df)}** standards in CSV:")
         st.dataframe(
             filtered_df[["is_no", "title", "status", "technical_committee", "amendments", "price_in_india", "price_outside_india"]],
-            use_container_width=True
+            width="stretch"
         )
 
         # Standard Detail Inspector

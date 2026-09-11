@@ -31,19 +31,23 @@ def render_tab_chat(
         cols_btn = st.columns(3)
         clicked_query = None
         for i, (label, query_text) in enumerate(sample_queries):
-            if cols_btn[i].button(label, key=f"quick_btn_{i}", use_container_width=True):
+            if cols_btn[i].button(label, key=f"quick_btn_{i}", width="stretch"):
                 clicked_query = query_text
                 st.session_state["user_query_input"] = query_text
 
-        # User Query Input
-        user_query = st.text_input(
-            "Enter Keyword, Product, or IS Number:",
-            value=clicked_query if clicked_query else st.session_state.get("user_query_input", ""),
-            placeholder="e.g., IS 10500, IS 138, pressure cooker, battery charger, solar inverter...",
-            key="user_query_input"
-        )
+        # Search Form to enable pressing Enter to submit
+        with st.form(key="search_form", clear_on_submit=False):
+            default_val = clicked_query if clicked_query else st.session_state.get("user_query_input", "")
+            user_query = st.text_input(
+                "Enter Keyword, Product, or IS Number:",
+                value=default_val,
+                placeholder="e.g., IS 10500, IS 138, pressure cooker, battery charger, solar inverter...",
+                key="user_query_input"
+            )
+            submit_btn = st.form_submit_button("Search and Analyze", type="primary", width="stretch")
 
-        submit_btn = st.button("Search and Analyze", type="primary", use_container_width=True)
+        if submit_btn and not user_query.strip():
+            st.warning("Please enter an IS number, product name, or keyword before searching.")
 
     with col_inspect:
         st.subheader("Automated Loop & Pipeline Inspector")
@@ -51,7 +55,11 @@ def render_tab_chat(
         st.info("Webpage Search ➔ Scrape Data & HTML Doc ➔ Store in CSV ➔ LLM 1 (Filter) ➔ LLM 2 (Advisor)")
 
     # Determine query to execute (either from quick click or text submission)
-    query_to_run = clicked_query or (user_query.strip() if submit_btn and user_query.strip() else None)
+    query_to_run = None
+    if clicked_query:
+        query_to_run = clicked_query
+    elif submit_btn and user_query.strip():
+        query_to_run = user_query.strip()
 
     if query_to_run:
         with st.spinner(f"Executing Automated Search, Scrape, and Dual-LLM Loop for '{query_to_run}'..."):
